@@ -1,101 +1,108 @@
-import Image from "next/image";
+'use client' // Indicates that this is a client-side component
+import React, { useState } from "react";
 
-export default function Home() {
+// Define the structure of a task
+interface Task {
+  text: string; // The task description
+  completed: boolean; // Indicates if the task is completed
+}
+
+// Main ToDo application component
+const ToDoApp = () => {
+  // State for the current input task
+  const [task, setTask] = useState<string>("");
+  // State for the list of tasks
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  // Function to add a new task
+  const addTask = () => {
+    if (task.trim() !== "") {
+      // Add new task to the list only if it's not empty
+      setTasks([...tasks, { text: task, completed: false }]);
+      setTask(""); // Clear the input field after adding
+    }
+  };
+
+  // Function to toggle task completion status
+  const toggleTaskCompletion = (index: number) => {
+    setTasks(
+      tasks.map((t, i) =>
+        i === index ? { ...t, completed: !t.completed } : t
+      )
+    );
+  };
+
+  // Function to delete a task
+  const deleteTask = (indexToDelete: number) => {
+    // Filter out the task at the specified index
+    setTasks(tasks.filter((_, index) => index !== indexToDelete));
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    // Main container - centers content vertically and horizontally
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      {/* Centered Box - contains all todo app elements */}
+      <div className="bg-white shadow-lg rounded-lg p-6 w-96">
+        {/* Heading */}
+        <h1 className="text-2xl font-bold text-center mb-6 text-blue-500">
+          TO-DOs
+        </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+        {/* Input Field and Add Button - for adding new tasks */}
+        <div className="flex items-center mb-4">
+          <input
+            type="text"
+            placeholder="Enter a task"
+            value={task}
+            onChange={(e) => setTask(e.target.value)}
+            className="flex-1 px-4 py-2 border rounded-l-lg focus:outline-none focus:ring focus:border-blue-300"
+          />
+          <button
+            onClick={addTask}
+            className="px-4 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+            Add
+          </button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        {/* Task List - displays all added tasks */}
+        <ul className="space-y-2">
+          {tasks.map((item, index) => (
+            <li
+              key={index}
+              className="flex items-center justify-between bg-gray-50 p-2 rounded-lg shadow-sm"
+            >
+              <div className="flex items-center mb-4 space-x-2">
+                {/* Checkbox for task completion */}
+                <input
+                  type="checkbox"
+                  checked={item.completed}
+                  onChange={() => toggleTaskCompletion(index)}
+                  className="mr-2 rounded text-blue-500 focus:ring-0"
+                />
+                {/* Task Text (strikethrough if completed) */}
+                <span
+                  className={`${
+                    item.completed ? "line-through text-gray-400" : ""
+                  }`}
+                >
+                  {item.text}
+                </span>
+              </div>
+              {/* Delete button - removes the task from the list */}
+              <button
+                onClick={() => deleteTask(index)}
+                className="px-2 py-1 bg-red-500 text-white text-sm rounded-lg hover:bg-red-600"
+              >
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
-}
+};
+
+// Export the ToDoApp component as the default export
+export default ToDoApp;
